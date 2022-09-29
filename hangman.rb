@@ -1,15 +1,16 @@
-class Hangman
+class Hangman 
   # load Google dictionary
   # randomly select a word between 5 and 12 characters long for the secret word.
-  attr_accessor :player 
+  attr_accessor :player, :secret_word
 
-  def initialize(player)
-    @player = player 
+  def initialize(player, secret_word)
+    @player = player
+    @secret_word = secret_word
+    display_board
   end
 
-  
-
   def display_board
+    puts "The Secret Word is #{secret_word}"
     puts "Board: _ _ _ _ _ "
     winner_check
   end
@@ -36,9 +37,9 @@ name = gets.chomp
 sleep 0.5
 player = Player.new(name)
 puts "Good luck, #{name}"
-new_game = Hangman.new(player)
 # read words txt file to array so we can pick random one
 words_list = File.read('google-10000-english-no-swears.txt').split
-secret_word = words_list.sample
-puts "The Secret Word is #{secret_word}"
-new_game.display_board
+# between 5 and 12 characters long
+filtered_words_list = words_list.select { |word| word.length >= 5 && word.length <= 12 }
+secret_word = filtered_words_list.sample
+new_game = Hangman.new(player, secret_word)
