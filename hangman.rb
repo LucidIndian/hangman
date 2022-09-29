@@ -5,7 +5,7 @@ class Hangman
 
   def initialize(player)
     @player = player
-    @round = 1 # play
+    @remaining_guesses = 6 # decrement
     
     # secret word precessing
     # read words txt file to array so we can pick random one
@@ -22,7 +22,7 @@ class Hangman
   end
 
   def display_board()
-    puts "Round: #{@round}"
+    puts "Remaining guesses: #{@remaining_guesses}"
     puts "Board: _ _ _ _ _ "
     play
   end
@@ -33,11 +33,12 @@ class Hangman
   end
 
   def winner_check
-    if @round == 7
+    @remaining_guesses = @remaining_guesses - 1
+    if @remaining_guesses == 0
       puts "You're hung, #{player.name} loses!"
     else
       #keep playing
-      @round = @round + 1
+ 
       display_board()
     end   
   end
