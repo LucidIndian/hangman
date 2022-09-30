@@ -19,7 +19,7 @@ class Hangman
     # p secret_word_array
     # display board shows currrent state and
     # starts to match secret word length, with blanks
-    @display_array = Array.new(@secret_word.length,"X")
+    @display_array = Array.new(@secret_word.length,"_")
     display_board()
   end
 
@@ -34,18 +34,24 @@ class Hangman
 
     if @secret_word_array.any?(letter)
       # do not decrement guess!
+      # update board
+      # @secret_word_array.map.with_index { |word, idx| [ch, idx] }
+      match_index_arr = @secret_word_array.each_index.select{|idx| @secret_word_array[idx] == letter} 
+      # convert to String
+      match_index_int = match_index_arr.join.to_i
+      puts "match_index_int is #{match_index_int} and class #{match_index_int.class}"
+
+      # update board: a succsessful guess will update the @display_array
+      @display_array[match_index_int] = letter
     else
       # decrement guesses since guess (letter) was not in secret word
       @remaining_guesses = @remaining_guesses - 1
     end
     
-    # update board: a succsessful guess will update the @display_array
-    
     if @remaining_guesses == 0
       puts "You're hung, #{player.name} loses!"
     else
       #keep playing
- 
       display_board()
     end
   end
