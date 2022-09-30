@@ -1,19 +1,18 @@
 class Hangman 
-  # load Google dictionary
-  # randomly select a word between 5 and 12 characters long for the secret word.
+ 
   attr_accessor :player
 
   def initialize(player)
     @player = player
-    @remaining_guesses = 6 # decrement
-    # secret word processing
-    # read words txt file to array so we can pick random one
-    @words_list = File.read('google-10000-english-no-swears.txt').split 
-    # between 5 and 12 characters long
-    @filtered_words_list = @words_list.select { |word| word.length >= 5 && word.length <= 12 }
-    @secret_word = @filtered_words_list.sample
-    # create X num dashes to match chars on secret_word
-    @secret_word_array = @secret_word.split("")
+    @remaining_guesses = 6 # decrement w/ incorrect guesses later
+    # secret word processing (Own method?)
+      # load Google dictionary: read words txt file to array so we can pick random one
+      @words_list = File.read('google-10000-english-no-swears.txt').split 
+      # select a word between 5 and 12 characters long for the secret word.
+      @filtered_words_list = @words_list.select { |word| word.length >= 5 && word.length <= 12 }
+      @secret_word = @filtered_words_list.sample
+      # create X num dashes to match chars on secret_word
+      @secret_word_array = @secret_word.split("")
     puts "The Secret Word is \"#{@secret_word}\""
     # to solve for repeat letters, check this list as an
     # additional condition before/helping to update
@@ -44,12 +43,13 @@ class Hangman
       # replace correct guess from remaining letters array with a non letter so it can't be guessed again
       match_index_arr.each {|index| @remaining_letters_array[index] = 0}
       winner_check
-    else @remaining_letters_array.none?(guess)
+    elsif @remaining_letters_array.none?(guess)
       # decrement guesses since guess (letter) was not in secret word
       @remaining_guesses = @remaining_guesses - 1
       display_board # keep it moving but skip winner_check so no play was made
+    else 
+      # nothing
     end
-    
   end
 
   def winner_check
@@ -65,6 +65,7 @@ class Hangman
       display_board()
     end
   end
+
 end # END class
 
 class Player
@@ -87,10 +88,10 @@ class Player
       player_guess = gets.chomp
       end
       puts "player_guess is #{player_guess}"
-      player_guess = player_guess.downcase
     else 
       puts "Error in guess method"
     end
+    player_guess = player_guess.downcase
   end
 
   def save_game
