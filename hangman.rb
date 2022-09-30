@@ -15,34 +15,45 @@ class Hangman
     @secret_word = @filtered_words_list.sample
     # create X num dashes to match chars on secret_word
     @secret_word_array = @secret_word.split("")
-    puts "The Secret Word is #{@secret_word}"
+    puts "The Secret Word is \"#{@secret_word}\""
     # p secret_word_array
-    # display_array =  
+    @display_array = []
     display_board()
   end
 
   def display_board()
     puts "Remaining guesses: #{@remaining_guesses}"
-    puts "Board: _ _ _ _ _ "
+    # puts "Board: _ _ _ _ _ "
     play
   end
 
   def play(letter = player.guess)
     # puts "the letter class is #{letter.class}"
-    winner_check
+    puts "player's letter is #{letter} and the class is #{letter.class}"
+    winner_check(letter)
   end
 
-  def winner_check
-    @remaining_guesses = @remaining_guesses - 1
+  def winner_check(letter)
+    # add logic to only decrement if the guess is incorrect
+
+    if @secret_word_array.any?(letter)
+      # do not decrement guess!
+    else
+      # decrement guesses since guess (letter) was not in secret word
+      @remaining_guesses = @remaining_guesses - 1
+    end
+    
+    # update board
+    
     if @remaining_guesses == 0
       puts "You're hung, #{player.name} loses!"
     else
       #keep playing
  
       display_board()
-    end   
+    end
   end
-end  
+end # END class
 
 class Player
   attr_accessor :name
@@ -53,15 +64,16 @@ class Player
 
   def guess
     puts "#{self.name}, what's your guess? (A-Z)"
+    player_guess = gets.chomp
+    # Ensure guess is a letter (case insensitive) and not more than 1
+    until /\p{L}/.match(player_guess) && player_guess.length == 1 
+      puts "Oops, please type one letter, A-Z"
       player_guess = gets.chomp
-      # Ensure guess is a letter (case insensitive) and not more than 1
-      until /\p{L}/.match(player_guess) && player_guess.length == 1 
-        puts "Oops, please type one letter, A-Z"
-        player_guess = gets.chomp
-      end
+    end
+    player_guess
   end
 
-end
+end # END class
 
 # Game Startup sequence
 puts "Welcome to Tygh's Hangman game!"
