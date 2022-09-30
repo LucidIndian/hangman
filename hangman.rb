@@ -74,12 +74,13 @@ class Player
     puts "#{self.name}, what's your guess? (A-Z)"
     player_guess = gets.chomp
     # Ensure guess is a letter (case insensitive) and not more than 1
-    until /\p{L}/.match(player_guess) && player_guess.length == 1 
+    until /\p{L}/.match(player_guess) && player_guess.length == 1
       puts "Oops, please type one letter, A-Z"
       player_guess = gets.chomp
     end
     # puts "player_guess class is #{player_guess.class}"
-    player_guess
+    puts "player_guess is #{player_guess}"
+    player_guess.downcase # to make our match-checker work in the `play` method
   end
 
 end # END class
