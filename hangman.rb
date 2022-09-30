@@ -17,23 +17,19 @@ class Hangman
     @secret_word_array = @secret_word.split("")
     puts "The Secret Word is \"#{@secret_word}\""
     # p secret_word_array
-    @display_array = []
+    # display board shows currrent state and
+    # starts to match secret word length, with blanks
+    @display_array = Array.new(@secret_word.length,"X")
     display_board()
   end
 
   def display_board()
     puts "Remaining guesses: #{@remaining_guesses}"
-    # puts "Board: _ _ _ _ _ "
-    play
+    puts "@display_array is #{@display_array}"
+    winner_check
   end
 
-  def play(letter = player.guess)
-    # puts "the letter class is #{letter.class}"
-    puts "player's letter is #{letter} and the class is #{letter.class}"
-    winner_check(letter)
-  end
-
-  def winner_check(letter)
+  def winner_check(letter = player.guess)
     # add logic to only decrement if the guess is incorrect
 
     if @secret_word_array.any?(letter)
@@ -43,7 +39,7 @@ class Hangman
       @remaining_guesses = @remaining_guesses - 1
     end
     
-    # update board
+    # update board: a succsessful guess will update the @display_array
     
     if @remaining_guesses == 0
       puts "You're hung, #{player.name} loses!"
@@ -78,7 +74,7 @@ end # END class
 # Game Startup sequence
 puts "Welcome to Tygh's Hangman game!"
 sleep 0.5
-puts "Player, enter your first name, then return"
+puts "Player, enter your first name, then \"return\""
 name = gets.chomp
 sleep 0.5
 player = Player.new(name)
