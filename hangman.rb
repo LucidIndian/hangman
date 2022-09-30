@@ -47,8 +47,9 @@ class Hangman
     else @remaining_letters_array.none?(guess)
       # decrement guesses since guess (letter) was not in secret word
       @remaining_guesses = @remaining_guesses - 1
-      # old: display_board
+      display_board # keep it moving but skip winner_check so no play was made
     end
+    
   end
 
   def winner_check
