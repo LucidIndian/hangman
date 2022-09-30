@@ -6,8 +6,7 @@ class Hangman
   def initialize(player)
     @player = player
     @remaining_guesses = 6 # decrement
-    
-    # secret word precessing
+    # secret word processing
     # read words txt file to array so we can pick random one
     @words_list = File.read('google-10000-english-no-swears.txt').split 
     # between 5 and 12 characters long
@@ -16,43 +15,50 @@ class Hangman
     # create X num dashes to match chars on secret_word
     @secret_word_array = @secret_word.split("")
     puts "The Secret Word is \"#{@secret_word}\""
-    # p secret_word_array
+    # to solve for repeat letters, check this list as an
+    # additional condition before/helping to update
+    @remaining_letters_array = @secret_word_array
     # display board shows currrent state and
     # starts to match secret word length, with blanks
     @display_array = Array.new(@secret_word.length,"_")
     display_board()
+    play()
+  end
+
+  # brought back the play method so I can show the updated/compelted board before declaring a winner and ending the game
+  def play(letter = player.guess)
+    if @remaining_letters_array.any?(letter) # false if correct guess already removed it
+      # do not decrement guess, but update board
+      # first, get indeices of all matches
+      match_index_arr = @secret_word_array.each_index.select{|idx| @secret_word_array[idx] == letter} 
+      # second, update display with the letter/guess at each index (works for duplicate letters)
+      match_index_arr.each {|index| @display_array[index] = letter}
+      # replace correct guess from remaining letters array with a non letter so it can't be guessed again
+      match_index_arr.each {|index| @remaining_letters_array[index] = 0}
+    else
+      # decrement guesses since guess (letter) was not in secret word
+      @remaining_guesses = @remaining_guesses - 1
+    end
+    display_board
+    winner_check
   end
 
   def display_board()
     puts "Remaining guesses: #{@remaining_guesses}"
     puts "@display_array is #{@display_array}"
-    winner_check
   end
 
-  def winner_check(letter = player.guess)
-    # add logic to only decrement if the guess is incorrect
-
-    if @secret_word_array.any?(letter)
-      # do not decrement guess!
-      # update board
-      # @secret_word_array.map.with_index { |word, idx| [ch, idx] }
-      match_index_arr = @secret_word_array.each_index.select{|idx| @secret_word_array[idx] == letter} 
-      # convert to String
-      match_index_int = match_index_arr.join.to_i
-      puts "match_index_int is #{match_index_int} and class #{match_index_int.class}"
-
-      # update board: a succsessful guess will update the @display_array
-      @display_array[match_index_int] = letter
-    else
-      # decrement guesses since guess (letter) was not in secret word
-      @remaining_guesses = @remaining_guesses - 1
-    end
-    
+  def winner_check
     if @remaining_guesses == 0
       puts "You're hung, #{player.name} loses!"
+      return
+    # condition to prove player wins:
+    elsif @display_array.none?("_") 
+      puts "Congratulations, #{player.name}, you saved yourself from being hung!"
+      return
     else
       #keep playing
-      display_board()
+      play()
     end
   end
 end # END class
@@ -72,6 +78,7 @@ class Player
       puts "Oops, please type one letter, A-Z"
       player_guess = gets.chomp
     end
+    # puts "player_guess class is #{player_guess.class}"
     player_guess
   end
 
