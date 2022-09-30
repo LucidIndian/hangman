@@ -22,30 +22,33 @@ class Hangman
     # starts to match secret word length, with blanks
     @display_array = Array.new(@secret_word.length,"_")
     display_board()
-    play()
-  end
-
-  # brought back the play method so I can show the updated/compelted board before declaring a winner and ending the game
-  def play(letter = player.guess)
-    if @remaining_letters_array.any?(letter) # false if correct guess already removed it
-      # do not decrement guess, but update board
-      # first, get indeices of all matches
-      match_index_arr = @secret_word_array.each_index.select{|idx| @secret_word_array[idx] == letter} 
-      # second, update display with the letter/guess at each index (works for duplicate letters)
-      match_index_arr.each {|index| @display_array[index] = letter}
-      # replace correct guess from remaining letters array with a non letter so it can't be guessed again
-      match_index_arr.each {|index| @remaining_letters_array[index] = 0}
-    else
-      # decrement guesses since guess (letter) was not in secret word
-      @remaining_guesses = @remaining_guesses - 1
-    end
-    display_board
-    winner_check
   end
 
   def display_board()
     puts "Remaining guesses: #{@remaining_guesses}"
     puts "@display_array is #{@display_array}"
+    # old: winner_check
+    play()
+  end
+
+  # brought back the play method so I can show the updated/compelted board before declaring a winner and ending the game
+  def play(guess = player.guess)
+    if guess == "save"
+      return # do not keep playing, STOP
+    elsif @remaining_letters_array.any?(guess) # false if correct guess already removed it
+      # do not decrement guess, but update board
+      # first, get indeices of all matches
+      match_index_arr = @secret_word_array.each_index.select{|idx| @secret_word_array[idx] == guess} 
+      # second, update display with the letter/guess at each index (works for duplicate letters)
+      match_index_arr.each {|index| @display_array[index] = guess}
+      # replace correct guess from remaining letters array with a non letter so it can't be guessed again
+      match_index_arr.each {|index| @remaining_letters_array[index] = 0}
+      winner_check
+    else @remaining_letters_array.none?(guess)
+      # decrement guesses since guess (letter) was not in secret word
+      @remaining_guesses = @remaining_guesses - 1
+      # old: display_board
+    end
   end
 
   def winner_check
@@ -58,7 +61,7 @@ class Hangman
       return
     else
       #keep playing
-      play()
+      display_board()
     end
   end
 end # END class
@@ -71,16 +74,29 @@ class Player
   end
 
   def guess
-    puts "#{self.name}, what's your guess? (A-Z)"
+    puts "#{self.name}, what's your guess? (A-Z) or type \"SAVE\" to store this game's progress."
+    # if SAVE, serialize the game class
     player_guess = gets.chomp
-    # Ensure guess is a letter (case insensitive) and not more than 1
-    until /\p{L}/.match(player_guess) && player_guess.length == 1
+    if player_guess == "SAVE"
+      save_game
+    elsif player_guess != "SAVE"
+      # Ensure guess is a letter (case insensitive) and not more than 1
+      until /\p{L}/.match(player_guess) && player_guess.length == 1
       puts "Oops, please type one letter, A-Z"
       player_guess = gets.chomp
+      end
+      puts "player_guess is #{player_guess}"
+      player_guess = player_guess.downcase
+    else 
+      puts "Error in guess method"
     end
-    # puts "player_guess class is #{player_guess.class}"
-    puts "player_guess is #{player_guess}"
-    player_guess.downcase # to make our match-checker work in the `play` method
+  end
+
+  def save_game
+    puts "Saving game..."
+    # self # current Hangman instance (object)
+    puts "Game sucessfully saved!"
+    return
   end
 
 end # END class
