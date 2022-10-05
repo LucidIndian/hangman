@@ -138,4 +138,20 @@ name = gets.chomp
 sleep 0.5
 player = Player.new(name)
 puts "Good luck, #{name}"
-new_game = Hangman.new(player)
+puts "LOAD or NEW? then hit return"
+player_choice = gets.chomp
+
+# Avoid creating a new game if one is loaded
+if player_choice == "LOAD"
+  puts "Loading game..."
+  gamefile = File.open("hangman_saved_game.yml", "r")
+  contents = gamefile.read
+  new_game = YAML::load( contents )
+  puts "Game sucessfully loaded!"
+  new_game.display_board
+  new_game.play
+elsif player_choice == "NEW"
+  new_game = Hangman.new(player)
+else  
+  puts "error in startup"
+end
