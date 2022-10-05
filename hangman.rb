@@ -1,5 +1,7 @@
 class Hangman 
- 
+  
+  require "yaml" # for saving and loading the game
+
   attr_accessor :player
 
   def initialize(player)
@@ -17,8 +19,7 @@ class Hangman
     # to solve for repeat letters, check this list as an
     # additional condition before/helping to update
     @remaining_letters_array = @secret_word_array
-    # display board shows currrent state and
-    # starts to match secret word length, with blanks
+    # display board shows currrent state & starts matching secret_word length, with blanks
     @display_array = Array.new(@secret_word.length,"_")
     display_board()
   end
@@ -33,7 +34,10 @@ class Hangman
   # brought back the play method so I can show the updated/compelted board before declaring a winner and ending the game
   def play(guess = player.guess)
     if guess == "save"
+      save_game # save game to YAML in the Hangman class
       return # do not keep playing, STOP
+    elsif guess == "load"
+      load_game
     elsif @remaining_letters_array.any?(guess) # false if correct guess already removed it
       # do not decrement guess, but update board
       # first, get indeices of all matches
@@ -66,9 +70,36 @@ class Hangman
     end
   end
 
+
+  def save_game # "to_yaml"
+    puts "Saving game..."
+    saved_game = YAML::dump(self)
+    # puts saved_game # prints a MASSIVE OBJECT WITH ALL 8K WORDS
+    fname = "hangman_saved_game.yml"
+    gamefile = File.open(fname, "w")
+    gamefile.puts saved_game
+    gamefile.close
+    puts "Game sucessfully saved!"
+    # self == current Hangman instance (object)
+  end
+
+  def load_game # load game
+    puts "Loading game..."
+    # self == current Hangman instance (object)
+    # load file
+    gamefile = File.open("hangman_saved_game.yml", "r")
+    contents = gamefile.read
+    new_game = YAML::load( contents )
+    puts "Game sucessfully loaded!"
+    new_game.display_board
+  end
+
+
 end # END class
 
+
 class Player
+
   attr_accessor :name
 
   def initialize(name)
@@ -76,13 +107,13 @@ class Player
   end
 
   def guess
-    puts "#{self.name}, what's your guess? (A-Z) or type \"SAVE\" to store this game's progress."
+    puts "#{self.name}, what's your guess? (A-Z) or type \"SAVE\" or \"LOAD\"."
     # if SAVE, serialize the game class
     player_guess = gets.chomp
-    if player_guess == "SAVE"
-      save_game
+    if player_guess == "SAVE" || "LOAD"
+      # just let it ride
     elsif player_guess != "SAVE"
-      # Ensure guess is a letter (case insensitive) and not more than 1
+      # Ensure non "SAVE" guess is a letter (case insensitive) and not more than 1
       until /\p{L}/.match(player_guess) && player_guess.length == 1
       puts "Oops, please type one letter, A-Z"
       player_guess = gets.chomp
@@ -94,12 +125,6 @@ class Player
     player_guess = player_guess.downcase
   end
 
-  def save_game
-    puts "Saving game..."
-    # self # current Hangman instance (object)
-    puts "Game sucessfully saved!"
-    return
-  end
 
 end # END class
 
