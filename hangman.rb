@@ -22,13 +22,13 @@ class Hangman
     # display board shows currrent state & starts matching secret_word length, with blanks
     @display_array = Array.new(@secret_word.length,"_")
     display_board()
+    play()
   end
 
   def display_board()
     puts "Remaining guesses: #{@remaining_guesses}"
     puts "@display_array is #{@display_array}"
     # old: winner_check
-    play()
   end
 
   # brought back the play method so I can show the updated/compelted board before declaring a winner and ending the game
@@ -46,27 +46,28 @@ class Hangman
       match_index_arr.each {|index| @display_array[index] = guess}
       # replace correct guess from remaining letters array with a non letter so it can't be guessed again
       match_index_arr.each {|index| @remaining_letters_array[index] = 0}
-      winner_check
     elsif @remaining_letters_array.none?(guess)
       # decrement guesses since guess (letter) was not in secret word
-      @remaining_guesses = @remaining_guesses - 1
-      display_board # keep it moving but skip winner_check so no play was made
+      @remaining_guesses -= 1
     else 
       # nothing
     end
+    winner_check
   end
 
   def winner_check
-    if @remaining_guesses == 0
-      puts "You're hung, #{player.name} loses!"
+    if @remaining_guesses < 1
+      puts "You're hung, you lose!"
       return
     # condition to prove player wins:
     elsif @display_array.none?("_") 
-      puts "Congratulations, #{player.name}, you saved yourself from being hung!"
+      puts "Congratulations, you saved yourself from being hung!"
+      display_board()
       return
     else
       #keep playing
       display_board()
+      play()
     end
   end
 
@@ -92,6 +93,7 @@ class Hangman
     new_game = YAML::load( contents )
     puts "Game sucessfully loaded!"
     new_game.display_board
+    new_game.play
   end
 
 
@@ -107,10 +109,10 @@ class Player
   end
 
   def guess
-    puts "#{self.name}, what's your guess? (A-Z) or type \"SAVE\" or \"LOAD\"."
+    puts "What's your guess? (A-Z) or type \"SAVE\" or \"LOAD\"."
     # if SAVE, serialize the game class
     player_guess = gets.chomp
-    if player_guess == "SAVE" || "LOAD"
+    if player_guess == "SAVE" || player_guess == "LOAD"
       # just let it ride
     elsif player_guess != "SAVE"
       # Ensure non "SAVE" guess is a letter (case insensitive) and not more than 1
@@ -119,10 +121,10 @@ class Player
       player_guess = gets.chomp
       end
       puts "player_guess is #{player_guess}"
-    else 
+    else
       puts "Error in guess method"
     end
-    player_guess = player_guess.downcase
+    player_guess.downcase
   end
 
 
